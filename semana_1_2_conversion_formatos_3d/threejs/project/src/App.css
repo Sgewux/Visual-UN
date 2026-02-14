@@ -1,0 +1,24 @@
+canvas {
+  height: 70vh !important;
+  /* background-color: blue; */
+}
+
+.selector {
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.all {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdown {
+  width: 120px;
+  height: 25px;
+}

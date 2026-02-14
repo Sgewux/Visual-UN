@@ -1,0 +1,128 @@
+{
+    "asset": {
+        "version": "2.0",
+        "generator": "Open Asset Import Library (assimp v5.2.0)"
+    },
+    "extensionsUsed": [
+        "KHR_materials_pbrSpecularGlossiness",
+        "FB_ngon_encoding"
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 23324,
+            "type": "VEC3",
+            "max": [
+                9.41236686706543,
+                5.557277679443359,
+                8.571527481079102
+            ],
+            "min": [
+                -8.16388988494873,
+                -5.369760513305664,
+                2.2351741790771486e-8
+            ]
+        },
+        {
+            "bufferView": 1,
+            "byteOffset": 0,
+            "componentType": 5126,
+            "count": 23324,
+            "type": "VEC3",
+            "max": [
+                0.9970194101333618,
+                0.9977693557739258,
+                1.0
+            ],
+            "min": [
+                -0.9969344735145569,
+                -0.9974011182785034,
+                -1.0
+            ]
+        },
+        {
+            "bufferView": 2,
+            "byteOffset": 0,
+            "componentType": 5125,
+            "count": 28314,
+            "type": "SCALAR",
+            "max": [
+                23323
+            ],
+            "min": [
+                0
+            ]
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 673032,
+            "uri": "teapot.bin"
+        }
+    ],
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteOffset": 0,
+            "byteLength": 279888,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 279888,
+            "byteLength": 279888,
+            "target": 34962
+        },
+        {
+            "buffer": 0,
+            "byteOffset": 559776,
+            "byteLength": 113256,
+            "target": 34963
+        }
+    ],
+    "materials": [
+        {
+            "name": "DefaultMaterial",
+            "pbrMetallicRoughness": {
+                "metallicFactor": 0.0
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "primitives": [
+                {
+                    "mode": 4,
+                    "material": 0,
+                    "indices": 2,
+                    "attributes": {
+                        "POSITION": 0,
+                        "NORMAL": 1
+                    }
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "name": "<STL_BINARY>",
+            "children": [
+                1
+            ]
+        },
+        {
+            "name": "node",
+            "mesh": 0
+        }
+    ],
+    "scenes": [
+        {
+            "nodes": [
+                0
+            ]
+        }
+    ],
+    "scene": 0
+}
