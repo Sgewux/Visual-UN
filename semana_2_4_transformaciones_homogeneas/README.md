@@ -192,7 +192,7 @@ Para visualizar que las transformaciones sí están ocurriendo a nivel algorítm
 2. La Tierra y la Luna componen rotación y traslación, variando también la cuarta columna (X, Y, Z globales, limitados a su Frame Local).
 3. Todas tienen un sistema de ejes `axesHelper` para dar feedback visual a las transformaciones locales.
 
-<img src="./media/threejs_solar_system.webp" alt="Sistema Solar Three.js" width="600"/>
+![idk](./media/threejs_solar_system.gif)
 
 ## Aprendizajes y dificultades
 
