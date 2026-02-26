@@ -160,6 +160,56 @@ Despues de esto se generó un gráfico interactivo con Plotly, el cual permite m
 
 ![idk](./media/brazo_robot.gif)
 
+
+
+### Unity
+
+Aplicar transformaciones homogéneas en coordenadas 2D y 3D, comprender la composición de transformaciones, realizar cambios de base entre sistemas de referencia, y aplicar estos conceptos en robótica y gráficos por computador.
+
+![alt text](./media/Unity_Carro.png)
+
+Sobre las llantas se realizan transformaciones de rotación, haciendo una trasformacion diferente sobre cada una de las llantas.
+
+Sobre la primera llanta se realiza una conversación local mediante Transform.position variando mediante una velocidad de rotacion y un delta de tiempo.
+
+```c#
+    public class Llanta : MonoBehaviour
+    {
+        public float velocidadRotacion = 67f; // grados por segundo
+
+        void Update()
+        {
+            transform.Rotate(Vector3.up * velocidadRotacion * Time.deltaTime, Space.Self);
+        }
+    }
+```
+
+Sobre la sergunda llanta se realiza una rotación local mediante conversiones entre Quaternion y Matrix4x4 primero se convierte la rotación actual en matriz, se crea otra matriz con el ángulo incremental calculado por la velocidad y deltaTime, luego se multiplican ambas matrices para combinar las rotaciones y finalmente se convierte la matriz resultante de nuevo a Quaternion para aplicarla al transform.localRotation
+
+```c#
+public class Llanta_matrix : MonoBehaviour
+{
+    public float velocidadRotacion = 67f; // grados por segundo
+    void Update()
+    {
+        float angulo = velocidadRotacion * Time.deltaTime;
+        Matrix4x4 rotacion = Matrix4x4.Rotate(Quaternion.Euler(0f, angulo, 0f));
+        Matrix4x4 actual = Matrix4x4.Rotate(transform.localRotation);   // Convierte la rotación actual del transform en matriz
+        Matrix4x4 resultado = actual * rotacion;      // Aplica la rotación multiplicando matrices
+        transform.localRotation = resultado.rotation;
+    }
+}
+```
+
+Se dibujaron los ejes con locales del objeto en la escena usando Gizmos, extendiendo cada linea desde la posición del objeto hasta 1 cordenada.
+
+![alt text](./media/Unity_ejes.png)
+
+Asi ejecutando las rotaciones de las llantas y una traslacion constante sobre el Chasis se genera la siguiente animacion
+
+![alt text](./media/Unity_animacion.gif)
+
+
 ## Aprendizajes y dificultades
 * Fué dificil poder generar el gráfico interactivo de la manera correcta para que no generara parpadeos ni auto-escalamientos extraños que afectaran su estética.
 * Es necesaria una matriz de rotación por cada eje cuando se trabaja en tercera dimensión, sin embargo se puede calcular el producto entre estas para tener una única matriz de rotación.
