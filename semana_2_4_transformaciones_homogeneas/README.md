@@ -22,7 +22,7 @@ $$M_{global hijo} = M_{global padre} * M_{local hijo}$$
 
 Y en nuestro modelo, debido a que el codo rota con respecto al hombro (el cual está en el origen), entonces se tiene que:
 
-$$ M_{global codo} = M_{local codo}$$
+$$ M*{global codo} = M*{local codo}$$
 
 Definimos unas coordenadas inciales, y guardamos las matrices "base" para poder hacer las transformaciones en base a estas después.
 
@@ -81,9 +81,11 @@ def rotationMatrix(theta, axis):
     else:
       raise Exception("Invalid axis")
 ```
+
 Despues se definió una función para manejar las rotaciones de cada articulación y que se encarga de propagar estas rotaciones a sus respectivos hijos
 
 #### Función para rotar la articulación del hombro
+
 ```
 def rotateShoulder(theta, axis):
     global M_elbow, Ml_wrist, Mg_wrist, Ml_hand, Mg_hand, elbow_t_x, elbow_t_y, elbow_t_z
@@ -109,6 +111,7 @@ def rotateShoulder(theta, axis):
 ```
 
 #### Función para rotar la articulación del codo
+
 ```
 def rotateElbow(theta, axis):
     global M_elbow, Ml_wrist, Mg_wrist, Ml_hand, Mg_hand, wrist_t_x, wrist_t_y, wrist_t_z
@@ -133,6 +136,7 @@ def rotateElbow(theta, axis):
 ```
 
 #### Función para rotar la articulación de la muñeca
+
 ```
 def rotateWrist(theta, axis):
     global M_elbow, Ml_wrist, Mg_wrist, Ml_hand, Mg_hand, hand_t_x, hand_t_y, hand_t_z
@@ -160,6 +164,89 @@ Despues de esto se generó un gráfico interactivo con Plotly, el cual permite m
 
 ![idk](./media/brazo_robot.gif)
 
+### Unity
+
+Aplicar transformaciones homogéneas en coordenadas 2D y 3D, comprender la composición de transformaciones, realizar cambios de base entre sistemas de referencia, y aplicar estos conceptos en robótica y gráficos por computador.
+
+![alt text](./media/Unity_Carro.png)
+
+Sobre las llantas se realizan transformaciones de rotación, haciendo una trasformacion diferente sobre cada una de las llantas.
+
+Sobre la primera llanta se realiza una conversación local mediante Transform.position variando mediante una velocidad de rotacion y un delta de tiempo.
+
+```c#
+    public class Llanta : MonoBehaviour
+    {
+        public float velocidadRotacion = 67f; // grados por segundo
+
+        void Update()
+        {
+            transform.Rotate(Vector3.up * velocidadRotacion * Time.deltaTime, Space.Self);
+        }
+    }
+```
+
+Sobre la sergunda llanta se realiza una rotación local mediante conversiones entre Quaternion y Matrix4x4 primero se convierte la rotación actual en matriz, se crea otra matriz con el ángulo incremental calculado por la velocidad y deltaTime, luego se multiplican ambas matrices para combinar las rotaciones y finalmente se convierte la matriz resultante de nuevo a Quaternion para aplicarla al transform.localRotation
+
+```c#
+public class Llanta_matrix : MonoBehaviour
+{
+    public float velocidadRotacion = 67f; // grados por segundo
+    void Update()
+    {
+        float angulo = velocidadRotacion * Time.deltaTime;
+        Matrix4x4 rotacion = Matrix4x4.Rotate(Quaternion.Euler(0f, angulo, 0f));
+        Matrix4x4 actual = Matrix4x4.Rotate(transform.localRotation);   // Convierte la rotación actual del transform en matriz
+        Matrix4x4 resultado = actual * rotacion;      // Aplica la rotación multiplicando matrices
+        transform.localRotation = resultado.rotation;
+    }
+}
+```
+
+#### Gráfico interactivo
+
+Se dibujaron los ejes con locales del objeto en la escena usando Gizmos, extendiendo cada linea desde la posición del objeto hasta 1 cordenada.
+
+![alt text](./media/Unity_ejes.png)
+
+Asi ejecutando las rotaciones de las llantas y una traslacion constante sobre el Chasis se genera la siguiente animacion
+
+![alt text](./media/Unity_animacion.gif)
+
+### Sistema Solar en Three.js
+
+Para la implementación en Three.js (empleando la librería React Three Fiber), se desarrolló un sistema solar animado (Sol, Tierra, Luna) para demostrar las transformaciones, anidación de coordenadas locales frente a globales y la aplicación de matemáticas manuales con matrices de transformación equivalentes a la versión de Python, pero en el contexto de animaciones directas.
+
+A diferencia de React puro donde el estado re-renderiza todo constantemente, para animar sin costo de rendimiento se apagó la actualización automática de matrices (`matrixAutoUpdate={false}`) en cada nodo u objeto, y se aplicaron manipulaciones con `THREE.Matrix4` usando el hook `useFrame`.
+
+La Luna orbita alrededor del sistema local de la Tierra, que a su vez orbita en el sistema global del Sol.
+
+```javascript
+// Órbita de la Luna (Hijo Local de la Tierra)
+if (moonRef.current) {
+  mRotationMoonY.makeRotationY(t * 5); // Rotación
+  mTranslationMoon.makeTranslation(2, 0, 0); // Radio de la órbita = 2
+
+  mMoonLocal.identity();
+  mMoonLocal.multiply(mRotationMoonY);
+  mMoonLocal.multiply(mTranslationMoon);
+
+  moonRef.current.matrix.copy(mMoonLocal); // Aplicar matriz manualmente
+}
+```
+
+Para visualizar que las transformaciones sí están ocurriendo a nivel algorítmico, también se captura y se muestra constantemente en UI la matriz 4x4 completa de cada cuerpo celeste, demostrando que:
+
+1. El Sol, al estar en el origen pero con un Spin (`makeRotationY`), solo varía sus componentes de rotación.
+2. La Tierra y la Luna componen rotación y traslación, variando también la cuarta columna (X, Y, Z globales, limitados a su Frame Local).
+3. Todas tienen un sistema de ejes `axesHelper` para dar feedback visual a las transformaciones locales.
+
+#### Gráfico interactivo
+
+![idk](./media/threejs_solar_system.gif)
+
 ## Aprendizajes y dificultades
-* Fué dificil poder generar el gráfico interactivo de la manera correcta para que no generara parpadeos ni auto-escalamientos extraños que afectaran su estética.
-* Es necesaria una matriz de rotación por cada eje cuando se trabaja en tercera dimensión, sin embargo se puede calcular el producto entre estas para tener una única matriz de rotación.
+
+- Fué dificil poder generar el gráfico interactivo de la manera correcta para que no generara parpadeos ni auto-escalamientos extraños que afectaran su estética.
+- Es necesaria una matriz de rotación por cada eje cuando se trabaja en tercera dimensión, sin embargo se puede calcular el producto entre estas para tener una única matriz de rotación.
+- En `React Three Fiber`, hay que tener cuidado con las dependencias desactualizadas (como la discrepancia de compatibilidad entre React 19 y versiones antiguas de `@react-three/drei`), para lo cual la solución más limpia terminó siendo usar controles vanilla directamente extraídos de `three/addons`.
