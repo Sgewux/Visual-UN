@@ -5,6 +5,8 @@ Entregado: 27 Feb 2026
 
 ## Objetivo
 
+Explorar los fundamentos de los espacios proyectivos y las matrices de proyección implementando escenas en múltiples entornos (Python, Unity, Processing, Three.js), comparando visualmente la proyección en perspectiva y ortográfica.
+
 ## Implementaciones
 
 ### Python
@@ -102,6 +104,49 @@ Para el ejercicio en processing, ubicamos 3 cubos con diferentes valores de `z`,
   box(80);
   popMatrix();
 ```
+
+### ThreeJS 
+
+Se construyó una escena 3D interactiva con las siguientes características:
+
+Tres objetos geométricos (cubo, torus, octaedro) posicionados a diferentes profundidades: z = -8, z = 0 y z = +8.
+Dos tipos de cámara intercambiables mediante botones en la interfaz:
+
+#### PerspectiveCamera — FOV 60°, simula la visión humana con división perspectiva.
+#### OrthographicCamera — proyección paralela, sin reducción de tamaño por distancia.
+
+
+`OrbitControls` de @react-three/drei para navegación libre (orbitar, zoom, desplazar).
+Panel informativo que muestra la descripción y la matriz de proyección correspondiente a la cámara activa.
+Animación de rotación continua en los objetos y niebla volumétrica para reforzar la percepción de profundidad.
+
+Los tres objetos se definen en un array con su posición, geometría y color. La separación deliberada en `z` es lo que permite que la diferencia entre cámaras sea visible.
+
+```jsx
+const objects = [
+  { pos: [-4, 0, -8], geo: "box",        color: "#FF6B6B", label: "Lejos (z = -8)"  },
+  { pos: [0,  0,  0], geo: "torus",      color: "#4ECDC4", label: "Medio (z = 0)"   },
+  { pos: [4,  0,  8], geo: "octahedron", color: "#FFE66D", label: "Cerca (z = +8)"  },
+];
+```
+
+useFrame se ejecuta en cada frame del loop de render de Three.js. Aquí se usa para rotar los objetos continuamente, lo que ayuda a percibir su volumen 3D independientemente de la cámara activa.
+
+```jsx
+useFrame(({ clock }) => {
+  const t = clock.getElapsedTime();
+  meshRefs.current.forEach((mesh, i) => {
+    if (mesh) mesh.rotation.y = t * 0.4 * (i % 2 === 0 ? 1 : -1);
+  });
+});
+```
+
+Finalmente se puede demostrar la diferencia visual entre ambas camaras: 
+
+<img src="./media/threejscamera0.png" alt="Sample Image" width="400"/>
+
+<img src="./media/threejscamera1.png" alt="Sample Image" width="400"/>
+
 #### Proyección en perspectiva
 <img src="./media/processing_perspectiva.png" alt="Sample Image" width="400"/>
 
@@ -110,3 +155,5 @@ Para el ejercicio en processing, ubicamos 3 cubos con diferentes valores de `z`,
 
 ## Aprendizajes y dificultades
 * Las "Cámaras" en motores gráficos son en realidad una matriz de proyección.
+* La diferencia entre perspectiva y ortográfica se reduce a si hay o no división perspectiva: dividir (x, y) entre la profundidad z. Eso es todo lo que cambia matemáticamente.
+* Coordinar que ambas cámaras en Three.js compartan la misma posición fue necesario para que la comparativa fuera válida. Si no, las diferencias podían atribuirse a la posición y no a la proyección.
